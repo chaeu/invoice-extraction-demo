@@ -1,10 +1,13 @@
 import json
 from pathlib import Path
+from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pipeline import process_pdf
 
-METADATA_FILE = Path("../invoices/metadata.json")
+load_dotenv()
+
+METADATA_FILE = Path(os.getenv("METADATA_FILE", "../invoices/metadata.json"))
 
 app = FastAPI(title="Invoice Extraction API")
 
