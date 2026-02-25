@@ -10,7 +10,9 @@ from datetime import date, datetime
 # Config
 
 OCR_MODEL = "glm-ocr"
+LLM_MODEL_LIGHT = "qwen3:4b"
 LLM_MODEL = "qwen3:8b"
+PIXMAP_RESOLUTION_FACTOR = 1.6
 
 # Schema
 
@@ -46,9 +48,9 @@ class Patient(BaseModel):
         return None
 
 class Treatment(BaseModel):
-    code: str | None = Field(None, description="Medical service code e.g. 'Ö1', 'L100'. Use null if not present.")
-    description:str | None = Field(None, description="Description of the medical service performed")
-    amount: float | None = Field(None, description="Cost of this treatment as decimal. Never include the total sum row.")
+    code:        str   | None = Field(None, description="Medical service code e.g. 'Ö1', 'L100'. Use null if not present.")
+    description: str   | None = Field(None, description="Description of the medical service performed")
+    amount:      float | None = Field(None, description="Cost of this treatment as decimal. Never include the total sum row.")
 
 class Invoice(BaseModel):
     invoice_date: date | None = Field(None, description="Date the invoice was issued, format DD.MM.YYYY")
@@ -113,8 +115,6 @@ def validate_invoice(invoice: Invoice) -> dict:
         flags["last_treatment_equals_sum_of_others"] = False
         flags["last_treatment_looks_like_sum"] = False
 
-    flags["total_amount_invalid"] = any ([flags["last_treatment_equals_sum_of_others"], flags["last_treatment_looks_like_sum"], flags["total_mismatch"]])
-
     score = round(1 - sum(flags.values()) / len(flags), 2)
     return {"score": score, "flags": flags}
 
@@ -137,7 +137,7 @@ def extract_text_digital(pdf_bytes: bytes) -> str:
 def extract_text_scan(pdf_bytes: bytes) -> str:
     doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
     page = doc[0]
-    mat = pymupdf.Matrix(2.0, 2.0)
+    mat = pymupdf.Matrix(PIXMAP_RESOLUTION_FACTOR, PIXMAP_RESOLUTION_FACTOR)
     pix = page.get_pixmap(matrix=mat)
     img_b64 = base64.b64encode(pix.tobytes("png")).decode("utf-8")
     doc.close()
@@ -146,7 +146,7 @@ def extract_text_scan(pdf_bytes: bytes) -> str:
         model=OCR_MODEL,
         messages=[{
             "role": "user",
-            "content": "Extract all text from this document exactly as it appears. Preserve the original layout, line breaks, and formatting. Do not summarize or interpret.",
+            "content": "Extrahiere mir den ganzen Text",
             "images": [img_b64]
         }],
         think=False,
@@ -154,7 +154,7 @@ def extract_text_scan(pdf_bytes: bytes) -> str:
     )
     return response.message.content
 
-# LLM extraction 
+# LLM extraction
 
 SYSTEM_PROMPT = f"""You are an expert in extracting information from Austrian private doctor's invoices (Wahlarztrechnungen).
 Rules:
@@ -170,9 +170,9 @@ Extract the following JSON structure:
 {json.dumps(Invoice.model_json_schema(), indent=2)}
 """
 
-def extract_structured_data(raw_text: str) -> tuple[Invoice | None, dict]:
+def extract_structured_data(raw_text: str, llm_model: str = LLM_MODEL_LIGHT) -> tuple[Invoice | None, dict]:
     response = ollama.chat(
-        model=LLM_MODEL,
+        model=llm_model,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user",   "content": f"Here is the invoice text:\n\n{raw_text}"}
@@ -181,7 +181,7 @@ def extract_structured_data(raw_text: str) -> tuple[Invoice | None, dict]:
         format="json",
         options={"temperature": 0}
     )
-
+    print(llm_model)
     try:
         invoice = Invoice.model_validate_json(response.message.content)
     except Exception as e:
@@ -193,7 +193,7 @@ def extract_structured_data(raw_text: str) -> tuple[Invoice | None, dict]:
 
 # Main pipeline
 
-def process_pdf(pdf_bytes: bytes) -> tuple[Invoice | None, dict, str]:
+def process_pdf(pdf_bytes: bytes, llm_model: str | None = None) -> tuple[Invoice | None, dict, str]:
     pdf_type = detect_pdf_type(pdf_bytes)
 
     if pdf_type == "digital":
@@ -201,5 +201,5 @@ def process_pdf(pdf_bytes: bytes) -> tuple[Invoice | None, dict, str]:
     else:
         raw_text = extract_text_scan(pdf_bytes)
 
-    invoice, validation = extract_structured_data(raw_text)
+    invoice, validation = extract_structured_data(raw_text, llm_model)
     return invoice, validation, pdf_type

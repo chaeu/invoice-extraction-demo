@@ -3,43 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <title>Invoice Extraction Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzAwMzM2NiIvPgogIDxyZWN0IHg9IjciIHk9IjgiIHdpZHRoPSIxMiIgaGVpZ2h0PSIyIiByeD0iMSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPgogIDxyZWN0IHg9IjciIHk9IjEzIiB3aWR0aD0iMTgiIGhlaWdodD0iMiIgcng9IjEiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICA8cmVjdCB4PSI3IiB5PSIxOCIgd2lkdGg9IjE0IiBoZWlnaHQ9IjIiIHJ4PSIxIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+CiAgPGNpcmNsZSBjeD0iMjQiIGN5PSIyMiIgcj0iNSIgZmlsbD0iIzFhN2E0YSIvPgogIDxwYXRoIGQ9Ik0yMS41IDIybDIgMiAzLjUtMy41IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIi8+Cjwvc3ZnPg==">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --blue:   #003366;
-      --blue-lt:#e8eef6;
-      --green:  #1a7a4a;
-      --amber:  #b45309;
-      --red:    #c0392b;
-      --grey:   #64748b;
-      --border: #e2e8f0;
-      --bg:     #f8fafc;
-      --card:   #ffffff;
-      --text:   #0f172a;
+      --bg:        #fafafa;
+      --surface:   #ffffff;
+      --surface2:  #f4f6f9;
+      --accent:    #2563eb;
+      --accent-lt: #eff6ff;
+      --green:     #16a34a;
+      --green-lt:  #f0fdf4;
+      --amber:     #d97706;
+      --amber-lt:  #fffbeb;
+      --red:       #dc2626;
+      --red-lt:    #fef2f2;
+      --border:    #e5e9f0;
+      --border2:   #d0d7e3;
+      --text:      #111827;
+      --text-mid:  #4b5563;
+      --text-dim:  #9ca3af;
+      --mono:      "JetBrains Mono", monospace;
+      --sans:      "Inter", sans-serif;
+      --radius:    10px;
+      --shadow:    0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: "DM Sans", sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+    }
 
     /* ── Header ── */
-    header { background: var(--blue); color: white; padding: 0 1.5rem; height: 52px; display: flex; align-items: center; flex-shrink: 0; }
-    .header-left { display: flex; align-items: center; gap: 0.75rem; }
-    .header-logo { font-size: 1rem; font-weight: 600; letter-spacing: -0.02em; }
-    .header-sep  { width: 1px; height: 18px; background: rgba(255,255,255,0.25); }
-    .header-sub  { font-size: 0.8rem; opacity: 0.6; font-weight: 300; }
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
 
-    /* ── Main 3-column layout ── */
-    #workspace { flex: 1; display: grid; grid-template-columns: 1fr 1.6fr 280px; overflow: hidden; }
+    .header-left { display: flex; align-items: center; gap: 1rem; }
 
-    /* ── PDF column (left) – has upload bar on top ── */
-    #pdf-column { display: flex; flex-direction: column; border-right: 1px solid var(--border); overflow: hidden; }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .header-icon {
+      width: 28px; height: 28px;
+      background: var(--accent);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+    .header-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .header-sep { width: 1px; height: 18px; background: var(--border2); }
+    .header-tag {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      font-weight: 400;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+
+    /* ── Layout ── */
+    #workspace { flex: 1; display: flex; overflow: hidden; }
+
+    /* ── PDF column ── */
+    #pdf-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+      background: var(--surface);
+    }
 
     #upload-bar {
-      background: white;
+      background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 0.5rem 0.75rem;
+      padding: 0.6rem 0.85rem;
       display: flex;
-      flex-direction: row;
       align-items: center;
       gap: 0.5rem;
       flex-shrink: 0;
@@ -48,103 +121,317 @@
     #drop-zone {
       flex: 1;
       min-width: 0;
-      border: 1.5px dashed var(--border);
+      border: 1.5px dashed var(--border2);
       border-radius: 7px;
-      padding: 0.4rem 0.6rem;
+      padding: 0.38rem 0.7rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
       cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      font-size: 0.82rem;
-      color: var(--grey);
+      transition: all 0.15s;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      background: var(--surface2);
     }
-    #drop-zone.drag-over { border-color: var(--blue); background: var(--blue-lt); }
+    #drop-zone:hover { border-color: var(--accent); background: var(--accent-lt); color: var(--accent); }
+    #drop-zone.drag-over { border-color: var(--accent); background: var(--accent-lt); }
     #drop-zone input { display: none; }
-    #file-name { font-family: "DM Mono", monospace; font-size: 0.75rem; color: var(--text); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+    #file-name {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--text);
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
 
     .upload-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
 
-    .btn { padding: 0.4rem 0.9rem; background: var(--blue); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.78rem; font-family: "DM Sans", sans-serif; font-weight: 500; white-space: nowrap; transition: background 0.15s; }
-    .btn:hover { background: #00254d; }
-    #status { font-size: 0.75rem; color: var(--grey); white-space: nowrap; }
+    select {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      padding: 0.32rem 0.5rem;
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text-mid);
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    select:hover, select:focus { border-color: var(--accent); color: var(--text); }
+
+    .btn {
+      padding: 0.35rem 1rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-family: var(--sans);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      transition: all 0.15s;
+      box-shadow: 0 1px 2px rgba(37,99,235,0.3);
+    }
+    .btn:hover { background: #1d4ed8; }
+
+    .btn:disabled { background: var(--border2); color: var(--text-dim); cursor: not-allowed; box-shadow: none; transform: none; }
+
+    #status { font-size: 0.72rem; color: var(--text-dim); white-space: nowrap; }
 
     /* ── PDF viewer ── */
-    #pdf-panel { flex: 1; background: #e8eef6; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    #pdf-panel .empty { color: var(--grey); font-size: 0.85rem; text-align: center; }
-    #pdf-panel .empty .icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    #pdf-panel {
+      flex: 1;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      min-height: 0;
+    }
+    #pdf-panel .empty { color: var(--text-dim); font-size: 0.8rem; text-align: center; }
+    #pdf-panel .empty .icon { font-size: 2.5rem; margin-bottom: 0.6rem; opacity: 0.35; }
     #pdf-embed { width: 100%; height: 100%; border: none; display: none; }
 
-    /* ── Data panel (middle) ── */
-    #data-panel { overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.85rem; }
-    #data-panel.empty-state { align-items: center; justify-content: center; color: var(--grey); font-size: 0.85rem; }
+    /* ── Data panel ── */
+    #data-panel {
+      flex: 1.6;
+      overflow-y: scroll;
+      padding: 1.1rem;
+      display: block;
+      background: var(--bg);
+      scrollbar-width: thin;
+      scrollbar-color: var(--border2) transparent;
+    }
+    #data-panel > * { margin-bottom: 0.7rem; }
+    #data-panel > *:last-child { margin-bottom: 0; }
+    #data-panel.empty-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+    }
 
     /* ── Cards ── */
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-    .card-header { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--border); background: #fafbfc; gap: 0.5rem; }
-    .card-header .pdf-type-badge { margin-left: auto; }
-    .card-header-left { display: flex; align-items: center; gap: 0.5rem; }
-    .card-title { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--grey); }
-    .pdf-type-badge { font-family: "DM Mono", monospace; font-size: 0.68rem; font-weight: 500; padding: 0.15rem 0.5rem; border-radius: 10px; }
-    .badge-digital     { background: #e0f2e9; color: var(--green); }
-    .badge-scan        { background: #fff3e0; color: var(--amber); }
-    .badge-handwritten { background: #f3e8ff; color: #7c3aed; }
-    .mini-score { font-family: "DM Mono", monospace; font-size: 0.72rem; font-weight: 500; padding: 0.15rem 0.5rem; border-radius: 10px; }
-    .card-body { padding: 0.75rem 0.9rem; }
-    .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1.2rem; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.55rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    .card-title {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-mid);
+    }
+
+    .pdf-type-badge {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      font-weight: 500;
+      padding: 0.12rem 0.45rem;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .badge-digital     { background: var(--green-lt); color: var(--green); border: 1px solid #bbf7d0; }
+    .badge-scan        { background: var(--amber-lt); color: var(--amber); border: 1px solid #fde68a; }
+    .badge-handwritten { background: #faf5ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+
+    .card-body { padding: 0.8rem 0.9rem; }
+    .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem 1.5rem; }
     .fields.three { grid-template-columns: 1fr 1fr 1fr; }
-    .field label { display: block; font-size: 0.68rem; color: var(--grey); margin-bottom: 0.1rem; text-transform: uppercase; letter-spacing: 0.04em; }
-    .field span { font-size: 0.85rem; font-weight: 500; }
+    .field label {
+      display: block;
+      font-size: 0.63rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      margin-bottom: 0.18rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .field span { font-size: 0.83rem; font-weight: 400; color: var(--text); }
     .field.required label::after { content: " *"; color: var(--amber); font-weight: 700; }
     .field.flagged span { color: var(--red); }
-    .field.flagged label { color: var(--red); }
-    .field.flagged label::after { color: var(--red); }
-    .divider { height: 1px; background: var(--border); margin: 0.6rem 0; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-    th { padding: 0.4rem 0.6rem; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--grey); border-bottom: 1px solid var(--border); text-align: left; }
-    td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #f1f5f9; }
+    .field.flagged label { color: var(--red); opacity: 0.8; }
+
+    .divider { height: 1px; background: var(--border); margin: 0.65rem 0; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    th {
+      padding: 0.38rem 0.65rem;
+      font-size: 0.62rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      background: var(--surface2);
+    }
+    td { padding: 0.4rem 0.65rem; border-bottom: 1px solid var(--bg); color: var(--text-mid); }
+    
     tr:last-child td { border-bottom: none; }
-    .total-row td { font-weight: 600; border-top: 1.5px solid var(--border); background: #fafbfc; }
-    .amount { text-align: right; font-family: "DM Mono", monospace; font-size: 0.8rem; }
-    .req-legend { font-size: 0.68rem; color: var(--grey); }
-    .req-legend span { color: var(--amber); font-weight: 700; }
+    .total-row td {
+      font-weight: 600;
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+    }
+    .amount { text-align: right; font-family: var(--mono); font-size: 0.75rem; }
+
+    .req-legend { font-size: 0.63rem; color: var(--text-dim); }
+    .req-legend span { color: var(--amber); }
 
     /* ── Validation sidebar ── */
-    #val-panel { border-left: 1px solid var(--border); background: var(--card); display: flex; flex-direction: column; overflow-y: auto; }
-    .val-header { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--grey); background: #fafbfc; flex-shrink: 0; }
-    .val-score-block { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); }
-    .val-score-row { display: flex; align-items: baseline; justify-content: space-between; }
-    .val-score-num { font-size: 1.8rem; font-weight: 600; font-family: "DM Mono", monospace; line-height: 1; }
-    .val-score-label { font-size: 0.68rem; color: var(--grey); text-transform: uppercase; letter-spacing: 0.06em; }
-    .score-bar { height: 4px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 0.5rem; }
-    .score-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
-    .val-section { padding: 0.65rem 1rem 0.5rem; border-bottom: 1px solid var(--border); }
-    .val-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; }
-    .val-section-title { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--grey); }
-    .flag-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; padding: 0.18rem 0; }
+    #val-panel {
+      width: 272px;
+      flex-shrink: 0;
+      border-left: 1px solid var(--border);
+      background: var(--surface);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border2) transparent;
+    }
+
+    .val-main-header {
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-mid);
+      background: var(--surface2);
+      flex-shrink: 0;
+    }
+
+    .val-section-block {
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .val-subheading {
+      display: flex;
+      flex-direction: column;
+      gap: 0.38rem;
+      padding: 0.55rem 1rem 0.5rem;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    .val-subheading-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .val-subheading-title {
+      font-size: 0.63rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-mid);
+    }
+    .val-subheading-pct {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      font-weight: 500;
+    }
+
+    .val-section-bar {
+      height: 3px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .val-section-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .val-flags {
+      padding: 0.5rem 1rem 0.55rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .flag-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.73rem;
+      padding: 0.16rem 0;
+      color: var(--text-mid);
+    }
     .flag-item.fail { color: var(--red); }
     .flag-item.ok   { color: var(--green); }
     .flag-item.warn { color: var(--amber); }
+
     .flag-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .fail .flag-dot { background: var(--red); }
     .ok   .flag-dot { background: var(--green); }
     .warn .flag-dot { background: var(--amber); }
-    .val-empty { padding: 2rem 1rem; text-align: center; color: var(--grey); font-size: 0.82rem; }
-    .gt-row { display: flex; flex-direction: column; padding: 0.2rem 0; font-size: 0.75rem; gap: 0.1rem; }
-    .gt-row .gt-label { font-size: 0.65rem; color: var(--grey); text-transform: uppercase; letter-spacing: 0.04em; }
-    .gt-row .gt-match { color: var(--green); }
-    .gt-row .gt-mismatch { color: var(--red); }
-    .gt-row .gt-expected { font-size: 0.7rem; color: var(--grey); font-family: "DM Mono", monospace; }
+
+    .val-gt-inner { padding: 0.5rem 1rem 0.55rem; }
+
+    .gt-row { display: flex; flex-direction: column; padding: 0.18rem 0; gap: 0.08rem; }
+    .gt-row .gt-label {
+      font-size: 0.58rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .gt-row .gt-match   { color: var(--green); font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; }
+    .gt-row .gt-mismatch{ color: var(--red);   font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; }
+    .gt-row .gt-expected {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      padding-left: 1rem;
+    }
+
+    .val-empty {
+      padding: 2.5rem 1rem;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+    }
   </style>
 </head>
 <body>
 
 <header>
   <div class="header-left">
-    <span class="header-logo">Invoice Extraction</span>
+    <div class="header-brand">
+      <div class="header-icon">📄</div>
+      <span class="header-title">Invoice Extraction</span>
+    </div>
     <div class="header-sep"></div>
-    <span class="header-sub">Demo Dashboard for Group Operations</span>
+    <span class="header-tag">Group Operations · Demo</span>
   </div>
+
 </header>
 
 <div id="workspace">
@@ -158,12 +445,21 @@
         <input type="file" id="file-input" accept=".pdf">
       </div>
       <div class="upload-actions">
-        <button class="btn" onclick="document.getElementById('file-input').click()">Upload PDF</button>
+        <select id="model-select">
+          <option value="qwen3:4b">qwen3:4b</option>
+          <option value="qwen3:8b">qwen3:8b</option>
+          <option value="gemma3:4b">gemma3:4b</option>
+          <option value="gemma3:12b">gemma3:12b</option>
+        </select>
+        <button class="btn" id="extract-btn" onclick="triggerExtract()" disabled>Extract</button>
         <span id="status"></span>
       </div>
     </div>
     <div id="pdf-panel">
-      <div class="empty"><div class="icon">📄</div><div>PDF preview appears here</div></div>
+      <div class="empty">
+        <div class="icon">📄</div>
+        <div>PDF preview appears here</div>
+      </div>
       <iframe id="pdf-embed"></iframe>
     </div>
   </div>
@@ -175,13 +471,15 @@
 
   <!-- RIGHT: Validation sidebar -->
   <div id="val-panel">
-    <div class="val-header">Validation</div>
+    <div class="val-main-header">Validation</div>
     <div class="val-empty">No data yet</div>
   </div>
 
 </div>
 
 <script>
+
+
   const API = "http://localhost:8000";
   const dropZone  = document.getElementById("drop-zone");
   const fileInput = document.getElementById("file-input");
@@ -195,10 +493,26 @@
   dropZone.addEventListener("dragover",  e => { e.preventDefault(); dropZone.classList.add("drag-over"); });
   dropZone.addEventListener("dragleave", ()  => dropZone.classList.remove("drag-over"));
   dropZone.addEventListener("drop", e => { e.preventDefault(); dropZone.classList.remove("drag-over"); if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]); });
-  fileInput.addEventListener("change", () => { if (fileInput.files[0]) upload(fileInput.files[0]); });
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files[0]) {
+      fileName.textContent = fileInput.files[0].name;
+      pdfPanel.querySelector(".empty").style.display = "none";
+      pdfEmbed.src = URL.createObjectURL(fileInput.files[0]);
+      pdfEmbed.style.display = "block";
+      document.getElementById("extract-btn").disabled = false;
+      status.textContent = "";
+    }
+  });
+
+  function triggerExtract() { if (fileInput.files[0]) upload(fileInput.files[0]); }
 
   function v(x)   { return (x != null && x !== "") ? x : "—"; }
-  function eur(x) { return x != null ? `€ ${x.toFixed(2)}` : "—"; }
+  function vDate(x) {
+    if (x == null || x === "") return "—";
+    const m = String(x).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    return m ? `${m[3]}.${m[2]}.${m[1]}` : x;
+  }
+  function eur(x) { return x != null ? `€\u00a0${x.toFixed(2)}` : "—"; }
 
   function scoreColor(s) {
     if (s >= 0.9) return "var(--green)";
@@ -255,7 +569,6 @@
     return "field";
   }
 
-  // Compute combined total amount valid flag from the three business logic flags
   function totalAmountValid(flags) {
     return !flags["total_mismatch"] &&
            !flags["last_treatment_equals_sum_of_others"] &&
@@ -296,24 +609,22 @@
 
   async function upload(file) {
     fileName.textContent = file.name;
-    status.textContent = "⏳ Processing…";
+    status.textContent = "Processing…";
     dataPanel.className = "";
-    dataPanel.innerHTML = "<p style='padding:2rem;color:var(--grey);font-size:0.85rem'>Extracting data…</p>";
-    valPanel.innerHTML  = "<div class='val-header'>Validation</div><div class='val-empty'>Processing…</div>";
-    pdfPanel.querySelector(".empty").style.display = "none";
-    pdfEmbed.src = URL.createObjectURL(file);
-    pdfEmbed.style.display = "block";
-
+    dataPanel.innerHTML = "<p style='padding:2rem;color:var(--text-dim);font-size:0.82rem'>Extracting data…</p>";
+    valPanel.innerHTML  = `<div class="val-main-header">Validation</div><div class="val-empty">Processing…</div>`;
     const form = new FormData();
     form.append("file", file);
+    const model = document.getElementById("model-select").value;
+    form.append("model", model);
     try {
       const res  = await fetch(`${API}/extract`, { method: "POST", body: form });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Unknown error");
-      status.textContent = "✅ Done";
+      status.textContent = `✓  ${model}`;
       render(data);
     } catch (err) {
-      status.textContent = `❌ ${err.message}`;
+      status.textContent = `✗ ${err.message}`;
     }
   }
 
@@ -324,16 +635,10 @@
     const pdfType = data.pdf_type;
     const doc     = inv.doctor  || {};
     const pat     = inv.patient || {};
-
-    const compPassed = completenessKeys.filter(k => !flags[k]).length;
-    const compScore  = compPassed / completenessKeys.length;
-    const compColor  = scoreColor(compScore);
     const totalValid = totalAmountValid(flags);
-
     const pdfBadgeHtml = `<span class="pdf-type-badge badge-${pdfType}">${pdfType}</span>`;
 
     dataPanel.innerHTML = `
-
       <div class="card">
         <div class="card-header">
           <span class="card-title">Invoice</span>
@@ -341,11 +646,11 @@
         </div>
         <div class="card-body">
           <div class="fields three">
-            <div class="${fc(flags,'invoice_date_missing')}"><label>Date</label><span>${v(inv.invoice_date)}</span></div>
+            <div class="${fc(flags,'invoice_date_missing')}"><label>Date</label><span>${vDate(inv.invoice_date)}</span></div>
             <div class="${fc(flags,'invoice_number_missing')}"><label>Invoice No.</label><span>${v(inv.invoice_number)}</span></div>
             <div class="field"><label>Type</label><span>${v(inv.document_type)}</span></div>
             <div class="field"><label>Payment</label><span>${v(inv.payment_method)}</span></div>
-            <div class="field" style="grid-column:span 2"><label>IBAN</label><span style="font-family:'DM Mono',monospace;font-size:0.75rem">${v(inv.iban)}</span></div>
+            <div class="field" style="grid-column:span 2"><label>IBAN</label><span style="font-family:var(--mono);font-size:0.72rem">${v(inv.iban)}</span></div>
           </div>
         </div>
       </div>
@@ -367,8 +672,8 @@
         <div class="card-body">
           <div class="fields">
             <div class="${fc(flags,'patient_first_name_missing','patient_last_name_missing')}"><label>Name</label><span>${v(pat.first_name)} ${v(pat.last_name)}</span></div>
-            <div class="${fc(flags,'patient_date_of_birth_missing')}"><label>Date of Birth</label><span>${v(pat.date_of_birth)}</span></div>
-            <div class="${fc(flags,'patient_social_security_number_missing')}"><label>SVNR</label><span style="font-family:'DM Mono',monospace">${v(pat.social_security_number)}</span></div>
+            <div class="${fc(flags,'patient_date_of_birth_missing')}"><label>Date of Birth</label><span>${vDate(pat.date_of_birth)}</span></div>
+            <div class="${fc(flags,'patient_social_security_number_missing')}"><label>SVNR</label><span style="font-family:var(--mono)">${v(pat.social_security_number)}</span></div>
           </div>
         </div>
       </div>
@@ -381,7 +686,7 @@
             <span>${v(inv.diagnosis)}</span>
           </div>
           <div class="divider"></div>
-          <label style="font-size:0.68rem;color:var(--grey);text-transform:uppercase;letter-spacing:0.04em">Treatments</label><span>${v(inv.treatments)}</span>
+          <label style="font-size:0.63rem;font-weight:500;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.06em">Treatments</label>
         </div>
         <div style="padding:0">
           <table>
@@ -389,7 +694,7 @@
             <tbody>
               ${(inv.treatments||[]).map(t=>`
                 <tr>
-                  <td style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--grey)">${v(t.code)}</td>
+                  <td style="font-family:var(--mono);font-size:0.72rem">${v(t.code)}</td>
                   <td>${v(t.description)}</td>
                   <td class="amount">${eur(t.amount)}</td>
                 </tr>`).join("")}
@@ -398,34 +703,59 @@
           </table>
         </div>
       </div>
-
-      <p class="req-legend"><span>*</span> Required fields for processing</p>
+      <div><p class="req-legend"><span>*</span> Required fields for processing</p></div>
     `;
 
     // ── Sidebar ──
-    function valSection(title, group) {
-      const keys   = requiredFlags[group];
-      const passed = keys.filter(k => {
-        // for business, use our computed flag
-        if (k === "total_amount_invalid") return totalValid;
-        return !flags[k];
-      }).length;
-      const c     = scoreColor(passed / keys.length);
-      const isBiz = group === "business";
-      return `<div class="val-section">
-        <div class="val-section-header">
-          <span class="val-section-title">${title}</span>
-          <span class="mini-score" style="background:${c}22;color:${c}">${passed}/${keys.length}</span>
-        </div>
-        ${keys.map(k => {
-          const failed = k === "total_amount_invalid" ? !totalValid : flags[k];
-          const cls = isBiz && failed ? "warn" : failed ? "fail" : "ok";
-          return `<div class="flag-item ${cls}"><div class="flag-dot"></div><span>${flagLabels[k]}</span></div>`;
-        }).join("")}
-      </div>`;
-    }
+    const compAllKeys = [...requiredFlags.invoice, ...requiredFlags.doctor, ...requiredFlags.patient];
+    const compPassed2 = compAllKeys.filter(k => !flags[k]).length;
+    const compPct = Math.round(compPassed2 / compAllKeys.length * 100);
+    const compCol = scoreColor(compPassed2 / compAllKeys.length);
 
-    let gtHtml = "";
+    const completionBlock = `
+      <div class="val-section-block">
+        <div class="val-subheading">
+          <div class="val-subheading-row">
+            <span class="val-subheading-title">Completion Rate</span>
+            <span class="val-subheading-pct" style="color:${compCol}">${compPct}%</span>
+          </div>
+          <div class="val-section-bar">
+            <div class="val-section-bar-fill" style="width:${compPct}%;background:${compCol}"></div>
+          </div>
+        </div>
+        <div class="val-flags">
+          ${compAllKeys.map(k => {
+            const failed = flags[k];
+            return `<div class="flag-item ${failed ? 'fail' : 'ok'}"><div class="flag-dot"></div><span>${flagLabels[k]}</span></div>`;
+          }).join("")}
+        </div>
+      </div>`;
+
+    const bizKeys = requiredFlags.business;
+    const bizPassed = bizKeys.filter(k => k === "total_amount_invalid" ? totalValid : !flags[k]).length;
+    const bizPct = Math.round(bizPassed / bizKeys.length * 100);
+    const bizCol = scoreColor(bizPassed / bizKeys.length);
+
+    const businessBlock = `
+      <div class="val-section-block">
+        <div class="val-subheading">
+          <div class="val-subheading-row">
+            <span class="val-subheading-title">Business Logic</span>
+            <span class="val-subheading-pct" style="color:${bizCol}">${bizPct}%</span>
+          </div>
+          <div class="val-section-bar">
+            <div class="val-section-bar-fill" style="width:${bizPct}%;background:${bizCol}"></div>
+          </div>
+        </div>
+        <div class="val-flags">
+          ${bizKeys.map(k => {
+            const failed = k === "total_amount_invalid" ? !totalValid : flags[k];
+            return `<div class="flag-item ${failed ? 'warn' : 'ok'}"><div class="flag-dot"></div><span>${flagLabels[k]}</span></div>`;
+          }).join("")}
+        </div>
+      </div>`;
+
+    let gtBlock = "";
     if (gt) {
       const rows = gtFields.map(f => {
         const extracted = f.ex(inv);
@@ -434,42 +764,39 @@
         const match = gtMatch(extracted, expected);
         return `<div class="gt-row">
           <span class="gt-label">${f.label}</span>
-          <span class="${match ? 'gt-match' : 'gt-mismatch'}">${match ? "✅ " : "❌ "}${v(extracted)}</span>
-          ${!match ? `<span class="gt-expected">expected: ${expected}</span>` : ""}
+          <span class="${match ? 'gt-match' : 'gt-mismatch'}">
+            <div class="flag-dot" style="background:${match ? 'var(--green)' : 'var(--red)'};flex-shrink:0"></div>
+            ${v(extracted)}
+          </span>
+          ${!match ? `<span class="gt-expected">↳ ${expected}</span>` : ""}
         </div>`;
       }).filter(Boolean).join("");
 
       const gtPassed = gtFields.filter(f => gt[f.gt] != null && gtMatch(f.ex(inv), gt[f.gt])).length;
       const gtTotal  = gtFields.filter(f => gt[f.gt] != null).length;
+      const gtPct    = Math.round(gtPassed / gtTotal * 100);
       const gtColor  = scoreColor(gtPassed / gtTotal);
 
-      gtHtml = `
-        <div class="val-score-block" style="padding-top:0.65rem;padding-bottom:0.65rem">
-          <div class="val-score-row">
-            <span class="val-score-label">Ground Truth</span>
-            <span class="mini-score" style="background:${gtColor}22;color:${gtColor}">${gtPassed}/${gtTotal}</span>
+      gtBlock = `
+        <div class="val-section-block">
+          <div class="val-subheading">
+            <div class="val-subheading-row">
+              <span class="val-subheading-title">Ground Truth</span>
+              <span class="val-subheading-pct" style="color:${gtColor}">${gtPct}%</span>
+            </div>
+            <div class="val-section-bar">
+              <div class="val-section-bar-fill" style="width:${gtPct}%;background:${gtColor}"></div>
+            </div>
           </div>
-        </div>
-        <div class="val-section">
-          <div class="val-section-title" style="margin-bottom:0.5rem">Field Accuracy</div>
-          ${rows}
+          <div class="val-gt-inner">${rows}</div>
         </div>`;
     }
 
     valPanel.innerHTML = `
-      <div class="val-header">Validation</div>
-      <div class="val-score-block">
-        <div class="val-score-row">
-          <div class="val-score-num" style="color:${compColor}">${Math.round(compScore*100)}%</div>
-        </div>
-        <div class="val-score-label" style="margin-top:0.25rem">Completion Rate</div>
-        <div class="score-bar"><div class="score-fill" style="width:${compScore*100}%;background:${compColor}"></div></div>
-      </div>
-      ${valSection("Invoice",  "invoice")}
-      ${valSection("Doctor",   "doctor")}
-      ${valSection("Patient",  "patient")}
-      ${valSection("Amount Validation", "business")}
-      ${gtHtml}
+      <div class="val-main-header">Validation</div>
+      ${completionBlock}
+      ${businessBlock}
+      ${gtBlock}
     `;
   }
 </script>

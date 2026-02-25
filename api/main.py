@@ -1,14 +1,12 @@
 import json
 from pathlib import Path
-from dotenv import load_dotenv
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from pipeline import process_pdf
-import os
+from fastapi import HTTPException
+from typing import Optional
+from pipeline import process_pdf, LLM_MODEL_LIGHT
 
-load_dotenv()
-
-METADATA_FILE = Path(os.getenv("METADATA_FILE", "../invoices/metadata.json"))
+METADATA_FILE = Path("../invoices/metadata.json")
 
 app = FastAPI(title="Invoice Extraction API")
 
@@ -20,17 +18,21 @@ app.add_middleware(
 )
 
 @app.post("/extract")
-async def extract_invoice(file: UploadFile = File(...)):
+async def extract_invoice(
+    file: UploadFile = File(...),
+    model: Optional[str] = Form(default=None)
+    
+):
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
 
+    effective_model = model or LLM_MODEL_LIGHT
     pdf_bytes = await file.read()
-    invoice, validation, pdf_type = process_pdf(pdf_bytes)
+    invoice, validation, pdf_type = process_pdf(pdf_bytes, llm_model=effective_model)
 
     if invoice is None:
         raise HTTPException(status_code=422, detail="Could not extract invoice data")
 
-    # Ground truth lookup by filename
     ground_truth = None
     if METADATA_FILE.exists():
         with open(METADATA_FILE, encoding="utf-8") as f:
@@ -40,6 +42,7 @@ async def extract_invoice(file: UploadFile = File(...)):
     return {
         "filename": file.filename,
         "pdf_type": pdf_type,
+        "model": effective_model,
         "invoice": invoice.model_dump(mode="json"),
         "validation": validation,
         "ground_truth": ground_truth,
